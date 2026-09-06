@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fdf6ea" />
+  <title>A Birthday Surprise</title>
+
+  <meta name="description" content="A special 50th birthday surprise ❤️" />
+  <meta property="og:title" content="A Birthday Surprise ❤️" />
+  <meta property="og:description" content="Tap the seal to open your birthday letter." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="te_IN" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:wght@700;800&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-1:#fffaf1;
+      --bg-2:#fbecd4;
+      --paper:#fffdf8;
+      --ink:#4a3b2e;
+      --muted:#8a7561;
+      --env:#fffaf3;
+      --env-shade:#f3e6cd;
+      --env-dark:#e2cfa2;
+      --env-darker:#cdb27c;
+      --flap-inner:#ffe3e8;
+      --gold:#d4af37;
+      --gold-bright:#f0cf6e;
+      --pink:#f4b6c2;
+      --mint:#9fe0d3;
+      --lavender:#d9c6ef;
+      --flame:#f2994a;
+      --shadow:0 26px 55px rgba(120,90,40,.28);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+
+    body{
+      font-family:"Nunito", "Noto Sans Telugu", Georgia, "Times New Roman", serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 50% 6%, rgba(212,175,55,.14), transparent 42%),
+        radial-gradient(ellipse at 50% 100%, rgba(212,175,55,.08), transparent 60%),
+        linear-gradient(160deg,var(--bg-1),var(--bg-2));
+      overflow:hidden;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .app{
+      min-height:100dvh;
+      display:grid;
+      place-items:center;
+      padding:max(24px, env(safe-area-inset-top))
+              18px
+              max(26px, env(safe-area-inset-bottom));
+      position:relative;
+      isolation:isolate;
+    }
+
+    /* drifting confetti */
+    .confetti{
+      position:absolute;
+      opacity:.85;
+      pointer-events:none;
+      animation:confettiDrift 4.6s infinite ease-in-out;
+    }
+    .confetti.dot{width:8px;height:8px;border-radius:50%}
+    .confetti.flake{width:7px;height:13px;border-radius:2px}
+
+    .confetti:nth-child(1){left:10%;top:16%;background:var(--gold);transform:rotate(12deg);animation-delay:.1s}
+    .confetti:nth-child(2){right:14%;top:22%;background:var(--mint);transform:rotate(-18deg);animation-delay:1.1s}
+    .confetti:nth-child(3){left:19%;bottom:24%;background:var(--lavender);transform:rotate(24deg);animation-delay:1.9s}
+    .confetti:nth-child(4){right:11%;bottom:20%;background:var(--pink);transform:rotate(-10deg);animation-delay:.6s}
+    .confetti:nth-child(5){left:6%;top:46%;background:var(--gold-bright);transform:rotate(-22deg);animation-delay:2.4s}
+    .confetti:nth-child(6){right:7%;top:44%;background:var(--pink);transform:rotate(16deg);animation-delay:1.6s}
+    .confetti:nth-child(7){left:27%;top:9%;background:var(--mint);transform:rotate(-8deg);animation-delay:2.9s}
+    .confetti:nth-child(8){right:24%;bottom:10%;background:var(--lavender);transform:rotate(20deg);animation-delay:.9s}
+
+    @keyframes confettiDrift{
+      0%,100%{opacity:.3;transform:translateY(0) rotate(0deg) scale(.85)}
+      50%{opacity:.95;transform:translateY(-10px) rotate(25deg) scale(1)}
+    }
+
+    .scene{
+      width:min(92vw, 430px);
+      height:min(76dvh, 650px);
+      min-height:510px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .eyebrow{
+      position:absolute;
+      top:0;
+      font-family:"Nunito", sans-serif;
+      font-weight:700;
+      font-size:13px;
+      letter-spacing:.03em;
+      color:#a8801f;
+      transition:opacity .35s ease, transform .35s ease;
+    }
+
+    .envelope-wrap{
+      width:min(86vw, 360px);
+      height:250px;
+      position:relative;
+      cursor:default;
+      perspective:1200px;
+      touch-action:manipulation;
+      user-select:none;
+      outline:none;
+    }
+
+    .envelope-wrap:focus-visible{
+      outline:3px solid rgba(212,175,55,.55);
+      outline-offset:10px;
+      border-radius:6px;
+    }
+
+    .envelope{
+      position:absolute;
+      left:0;right:0;bottom:0;
+      margin:auto;
+      width:100%;
+      height:210px;
+      overflow:hidden;
+      filter:drop-shadow(0 18px 22px rgba(120,90,40,.22));
+    }
+
+    .envelope-wrap.open .envelope{
+      overflow:visible;
+    }
+
+    .back{
+      position:absolute;
+      inset:0;
+      border-radius:2px;
+      overflow:hidden;
+      border:1px solid rgba(205,178,124,.4);
+      background:
+        radial-gradient(circle 4px at 18% 28%, var(--pink), transparent 100%),
+        radial-gradient(circle 3px at 72% 18%, var(--mint), transparent 100%),
+        radial-gradient(circle 5px at 42% 68%, var(--lavender), transparent 100%),
+        radial-gradient(circle 3px at 86% 58%, var(--gold-bright), transparent 100%),
+        radial-gradient(circle 4px at 26% 84%, var(--gold), transparent 100%),
+        linear-gradient(135deg, rgba(255,255,255,.5), transparent 45%),
+        var(--env-shade);
+    }
+
+    .letter{
+      position:absolute;
+      left:50%;
+      bottom:-154px;
+      width:88%;
+      height:180px;
+      transform:translateX(-50%) translateY(0) scale(.96) rotate(-2deg);
+      transform-origin:center bottom;
+      border-radius:4px 4px 6px 6px;
+      background:var(--paper);
+      border:1px solid rgba(205,178,124,.35);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.6),
+        0 6px 14px rgba(120,90,40,.18);
+      z-index:2;
+      transition:
+        transform .55s ease,
+        width .4s ease,
+        height .4s ease,
+        bottom .45s ease,
+        box-shadow .4s ease;
+      overflow:hidden;
+    }
+
+    /* one continuous, snappy pop the instant the seal is tapped */
+    .envelope-wrap.open .letter{
+      width:min(94vw, 390px);
+      height:min(68dvh, 520px);
+      bottom:28px;
+      transform:translateX(-50%) translateY(calc(50% - 91px)) scale(1) rotate(0deg);
+      box-shadow:var(--shadow);
+      z-index:9;
+      transition:
+        transform .68s cubic-bezier(.22,1.5,.36,1),
+        width .5s cubic-bezier(.22,1.5,.36,1),
+        height .5s cubic-bezier(.22,1.5,.36,1),
+        bottom .5s cubic-bezier(.22,1.5,.36,1),
+        box-shadow .5s ease .05s;
+    }
+
+    .crease{
+      position:absolute;
+      left:9%;
+      right:9%;
+      top:45%;
+      height:0;
+      border-top:1px dashed rgba(205,178,124,.4);
+      opacity:.8;
+      z-index:1;
+      pointer-events:none;
+      transition:opacity .5s ease;
+    }
+
+    .envelope-wrap.open .crease{
+      opacity:0;
+      transition:opacity .45s ease .15s;
+    }
+
+    /* soft confetti flecks printed on the card paper itself */
+    .letter::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle 3px at 8% 10%, rgba(212,175,55,.3), transparent 100%),
+        radial-gradient(circle 3px at 92% 14%, rgba(159,224,211,.35), transparent 100%),
+        radial-gradient(circle 3px at 14% 92%, rgba(217,198,239,.35), transparent 100%),
+        radial-gradient(circle 3px at 90% 88%, rgba(244,182,194,.35), transparent 100%);
+      opacity:.95;
+      pointer-events:none;
+    }
+
+    .letter::after{
+      content:"";
+      position:absolute;
+      inset:9px;
+      border:1px dashed rgba(205,178,124,.35);
+      border-radius:3px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .letter-content{
+      position:relative;
+      z-index:2;
+      height:100%;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      padding:22px 26px 34px;
+      scrollbar-width:thin;
+      opacity:0;
+      transition:opacity .4s ease 1.35s;
+    }
+
+    .cake-illustration{
+      display:block;
+      width:118px;
+      height:auto;
+      margin:0 auto 6px;
+    }
+
+    .letter h1{
+      margin:0 0 4px;
+      text-align:center;
+      font-family:"Playfair Display", Georgia, serif;
+      font-weight:800;
+      font-size:clamp(23px,6.2vw,30px);
+      line-height:1.15;
+      color:var(--ink);
+      letter-spacing:.005em;
+    }
+
+    .letter .subtitle{
+      display:block;
+      text-align:center;
+      color:var(--muted);
+      font-style:italic;
+      font-size:14px;
+      margin-top:5px;
+      letter-spacing:.01em;
+    }
+
+    .letter .rule{
+      width:130px;
+      height:10px;
+      margin:14px auto 20px;
+      background:
+        radial-gradient(circle, var(--gold) 0 2px, transparent 3px) repeat-x;
+      background-size:14px 10px;
+      background-position:center;
+      opacity:.7;
+    }
+
+    .letter p{
+      font-size:17px;
+      line-height:1.7;
+      margin:0 0 17px;
+    }
+
+    .letter p.opening{
+      font-family:"Playfair Display", Georgia, serif;
+      font-weight:700;
+      font-size:17px;
+      color:var(--ink);
+    }
+
+    .signature{
+      margin-top:22px;
+      font-style:italic;
+      line-height:1.6;
+    }
+
+    .ps{
+      font-size:14.5px;
+      font-style:italic;
+      color:var(--muted);
+      border-top:1px dashed rgba(205,178,124,.4);
+      padding-top:14px;
+      margin-top:6px;
+    }
+
+    .front{
+      position:absolute;
+      inset:0;
+      z-index:4;
+      pointer-events:none;
+      overflow:hidden;
+      border-radius:2px;
+    }
+
+    .front::before{
+      content:"";
+      position:absolute;
+      left:0;right:0;bottom:0;
+      width:100%;
+      height:100%;
+      background:var(--env);
+      clip-path:polygon(0 20%,50% 66%,100% 20%,100% 100%,0 100%);
+    }
+
+    .front::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:var(--env-dark);
+      clip-path:polygon(0 20%,50% 66%,0 100%);
+      opacity:.55;
+    }
+
+    .right-fold{
+      position:absolute;
+      inset:0;
+      z-index:5;
+      pointer-events:none;
+      background:var(--env-darker);
+      clip-path:polygon(100% 20%,50% 66%,100% 100%);
+      opacity:.4;
+      border-radius:0 0 2px 0;
+    }
+
+    .side-flap{
+      position:absolute;
+      top:16px;
+      width:50%;
+      height:118px;
+      z-index:6;
+      pointer-events:none;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+    }
+
+    .side-flap-left{
+      left:2px;
+      background:linear-gradient(135deg, #fffdf8 0%, var(--env) 55%, var(--env-dark) 100%);
+      clip-path:polygon(0 6%, 76% 2%, 100% 20%, 84% 100%, 0 52%);
+    }
+
+    .side-flap-right{
+      right:2px;
+      background:linear-gradient(225deg, #fffdf8 0%, var(--env) 55%, var(--env-dark) 100%);
+      clip-path:polygon(24% 2%, 100% 6%, 100% 52%, 16% 100%, 0 20%);
+    }
+
+    .flap{
+      position:absolute;
+      left:0;right:0;top:0;
+      height:130px;
+      z-index:7;
+      transform-origin:50% 0%;
+      transform:rotateX(0deg);
+      transform-style:preserve-3d;
+      transition:transform .78s cubic-bezier(.2,.72,.16,1);
+    }
+
+    .flap-face{
+      position:absolute;
+      inset:0;
+      background:var(--env-dark);
+      clip-path:polygon(0 0,100% 0,50% 100%);
+      backface-visibility:hidden;
+      border-bottom:2px solid var(--gold);
+    }
+
+    .flap-back{
+      position:absolute;
+      inset:0;
+      background:var(--flap-inner);
+      clip-path:polygon(0 0,100% 0,50% 100%);
+      transform:rotateX(180deg);
+      backface-visibility:hidden;
+    }
+
+    /* frosting-badge seal with a little candle on top */
+    .seal{
+      position:absolute;
+      left:50%;top:58%;
+      transform:translate(-50%,-50%);
+      width:70px;height:70px;
+      border-radius:50%;
+      border:2px solid rgba(212,175,55,.55);
+      background:
+        radial-gradient(circle 3px at 30% 30%, var(--pink), transparent 100%),
+        radial-gradient(circle 3px at 65% 35%, var(--mint), transparent 100%),
+        radial-gradient(circle 3px at 45% 62%, var(--lavender), transparent 100%),
+        radial-gradient(circle 3px at 70% 65%, var(--gold), transparent 100%),
+        radial-gradient(circle at 35% 28%, #ffffff, #fdf6ea 60%, #f3e6cd 100%);
+      color:var(--ink);
+      display:grid;
+      place-items:center;
+      z-index:8;
+      font-family:"Playfair Display", Georgia, serif;
+      font-weight:800;
+      font-size:21px;
+      box-shadow:0 8px 16px rgba(120,90,40,.25), inset 0 -3px 5px rgba(180,145,70,.18), inset 0 3px 5px rgba(255,255,255,.7);
+      transition:opacity .25s ease, transform .4s ease;
+      cursor:pointer;
+      padding:0;
+      line-height:1;
+    }
+
+    /* candle stick, planted on top of the badge */
+    .seal::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:-28px;
+      transform:translateX(-50%);
+      width:9px;
+      height:30px;
+      border-radius:3px 3px 1px 1px;
+      background:repeating-linear-gradient(45deg, var(--gold) 0 4px, #fff 4px 8px);
+      box-shadow:0 2px 3px rgba(0,0,0,.12);
+      z-index:9;
+    }
+
+    /* candle flame */
+    .seal::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:-40px;
+      transform:translateX(-50%) rotate(-6deg);
+      width:11px;
+      height:15px;
+      border-radius:50% 50% 50% 50% / 65% 65% 35% 35%;
+      background:radial-gradient(circle at 50% 30%, #fff6c8, var(--gold-bright) 45%, var(--flame) 85%);
+      box-shadow:0 0 10px 3px rgba(242,153,74,.5);
+      z-index:9;
+    }
+
+    .seal:hover,
+    .seal:focus-visible{
+      transform:translate(-50%,-53%) scale(1.04);
+    }
+
+    .seal:focus-visible{
+      outline:3px solid rgba(212,175,55,.55);
+      outline-offset:6px;
+    }
+
+    .seal small{
+      position:absolute;
+      bottom:-42px;
+      width:170px;
+      text-align:center;
+      font-family:"Nunito", sans-serif;
+      font-weight:700;
+      font-size:11px;
+      letter-spacing:.03em;
+      color:#a8801f;
+      pointer-events:none;
+    }
+
+    .envelope-wrap.open .flap{
+      transform:rotateX(-180deg);
+      z-index:1;
+    }
+
+    .envelope-wrap.open .seal{
+      opacity:0;
+      transform:translate(-50%,-72%) scale(.85);
+      pointer-events:none;
+    }
+
+    .envelope-wrap.open .letter-content{
+      opacity:1;
+      transition:opacity .4s ease .3s;
+    }
+    .envelope-wrap.open ~ .eyebrow{opacity:0}
+
+    .close-btn{
+      position:fixed;
+      right:max(16px, env(safe-area-inset-right));
+      top:max(16px, env(safe-area-inset-top));
+      width:42px;height:42px;
+      border:1px solid rgba(212,175,55,.4);
+      border-radius:50%;
+      background:rgba(255,253,248,.85);
+      color:var(--ink);
+      font-size:22px;
+      line-height:1;
+      display:grid;
+      place-items:center;
+      opacity:0;
+      pointer-events:none;
+      transform:scale(.85);
+      transition:.3s ease .6s;
+      backdrop-filter:blur(10px);
+      z-index:30;
+      cursor:default;
+    }
+
+    body.card-open .close-btn{
+      opacity:1;
+      pointer-events:auto;
+      transform:scale(1);
+    }
+
+    @media (max-height: 640px){
+      .scene{min-height:470px;height:88dvh}
+      .envelope-wrap.open .letter{
+        height:min(62dvh, 420px);
+        transform:translateX(-50%) translateY(calc(50% - 91px)) scale(1) rotate(0deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+        transition-delay:0ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <span class="confetti dot"></span>
+    <span class="confetti flake"></span>
+    <span class="confetti dot"></span>
+    <span class="confetti flake"></span>
+    <span class="confetti dot"></span>
+    <span class="confetti flake"></span>
+    <span class="confetti dot"></span>
+    <span class="confetti flake"></span>
+
+    <button class="close-btn" id="closeBtn" aria-label="Close letter">×</button>
+
+    <section class="scene">
+      <div class="eyebrow">A birthday surprise, sealed with a candle</div>
+
+      <div
+        class="envelope-wrap"
+        id="envelopeWrap"
+      >
+        <div class="envelope">
+          <div class="back"></div>
+          <div class="side-flap side-flap-left"></div>
+          <div class="side-flap side-flap-right"></div>
+
+          <article class="letter" aria-live="polite">
+            <div class="crease"></div>
+            <div class="letter-content" id="letterContent">
+              <svg class="cake-illustration" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <ellipse cx="80" cy="108" rx="55" ry="7" fill="rgba(120,90,40,0.08)"/>
+                <rect x="25" y="70" width="110" height="34" rx="7" fill="#fdf6ea" stroke="#e2cfa2" stroke-width="2"/>
+                <path d="M25,71 Q35,60 45,71 T65,71 T85,71 T105,71 T125,71 T135,71" fill="none" stroke="#e2cfa2" stroke-width="2"/>
+                <circle cx="40" cy="86" r="3" fill="#f4b6c2"/>
+                <circle cx="60" cy="90" r="3" fill="#9fe0d3"/>
+                <circle cx="80" cy="86" r="3" fill="#d9c6ef"/>
+                <circle cx="100" cy="90" r="3" fill="#f4b6c2"/>
+                <circle cx="120" cy="86" r="3" fill="#d4af37"/>
+                <rect x="50" y="42" width="60" height="30" rx="7" fill="#fffdf8" stroke="#e2cfa2" stroke-width="2"/>
+                <path d="M50,43 Q58,33 66,43 T82,43 T98,43 T110,43" fill="none" stroke="#e2cfa2" stroke-width="2"/>
+                <g>
+                  <rect x="62" y="20" width="5" height="24" rx="2" fill="#f4b6c2"/>
+                  <path d="M64.5,20 q-4,-6 0,-12 q4,6 0,12 z" fill="#f0cf6e"/>
+                </g>
+                <g>
+                  <rect x="78" y="13" width="5" height="31" rx="2" fill="#9fe0d3"/>
+                  <path d="M80.5,13 q-4,-6 0,-12 q4,6 0,12 z" fill="#f0cf6e"/>
+                </g>
+                <g>
+                  <rect x="94" y="20" width="5" height="24" rx="2" fill="#d9c6ef"/>
+                  <path d="M96.5,20 q-4,-6 0,-12 q4,6 0,12 z" fill="#f0cf6e"/>
+                </g>
+              </svg>
+
+              <h1>Happy 50th Birthday</h1>
+              <span class="subtitle">make a wish, then read on</span>
+              <div class="rule"></div>
+
+              <p class="opening">Dear Pinni,</p>
+
+              <p>
+                చిన్న attempt చేస్తున్నాను తెలుగులో రాయడానికి 😝. AI, Google, ఇంకా నాకు దొరికిన అన్ని technology powers వాడి somehow తెలుగు translation చేస్తున్నాను. So spelling mistakes గానీ, grammar disasters గానీ ఉంటే దయచేసి పట్టించుకోకండి. Please pardon my Telugu! 😂
+              </p>
+
+              <p>
+                Next summer తెలుగు classes తీసుకుంటా అని promise చేస్తున్నాను. Actually, ఈ letter అయ్యాక చూస్తుంటే winter classes కూడా అవసరం అవుతాయేమో 😝.
+              </p>
+
+              <p>
+                Video లో mention చేసినట్టు, I genuinely don't have the words to explain how much you mean to me and how important you are in my life. అందుకే పెద్ద పెద్ద మాటలు చెప్పడం కంటే, నాకు గుర్తున్న కొన్ని చిన్న చిన్న జ్ఞాపకాలతో ఈ ఉత్తరం రాయాలని అనిపించింది.
+              </p>
+
+              <p>
+                నేను probably 5th class లో ఉండి ఉంటాను. ఒక రోజు నేను, అమ్మ కలిసి నా చిన్నప్పటి photo albums చూస్తున్నాం. అలా casual గా photos చూస్తూ ఉండగా, ఒక picture లో నా ఉయ్యాల full గా decorate చేసి ఉంది. ఆ photo లో అమ్మ, అమ్మమ్మ, మీరు, రాధ అమ్మమ్మ, లలిత అమ్మమ్మ, ఇంకా కొంతమంది ఉన్నారు.
+              </p>
+
+              <p>
+                నేను అమ్మని, "ఈ ఉయ్యాల ఎవరు decorate చేశారు?" అని అడిగాను.<br />
+                అమ్మ వెంటనే, "పిన్నే చేసింది" అని చెప్పింది.<br />
+                అక్కడితో ఆపలేదు, మీ గురించి చెప్పడం మొదలు పెట్టింది.
+              </p>
+
+              <p>
+                మీరు చాలా young age నుంచే ఏ పని అయినా ముందుండి చేసేవాళ్లు అని, studies అయినా, career అయినా, family అయినా — చాలా ambitious గా ఉండి, అదే సమయంలో traditions ని కూడా value చేస్తూ, somehow అన్నిటినీ balance చేసేవాళ్లు అని చెప్పింది.
+              </p>
+
+              <p>
+                ఆ తర్వాత అమ్మ నాతో ఒక మాట చెప్పింది:<br />
+                "నువ్వు పెద్దయ్యాక పిన్ని లాగా అవ్వాలి. ఆ qualities అన్నీ నేర్చుకోవాలి."
+              </p>
+
+              <p>
+                5th standard అంటే నాకు ఒక 10 years ఉండి ఉంటాయి, I guess.<br />
+                కానీ funny thing ఏమిటంటే — ఆ రోజు ఆ మాట నా brain లో permanently save అయిపోయింది.
+              </p>
+
+              <p>
+                అప్పటి నుంచి నా mind లో మీరు అంటే — super talented, ambitious, high standards, అన్నీ manage చేయగల person.<br />
+                Basically, నా చిన్న brain లో మీరు ఒక benchmark అయిపోయారు.
+              </p>
+
+              <p>And then there was me.</p>
+
+              <p>
+                నేనేమో అంత ambitious person కాదు. IIT లో చదవలేదు. Normal university లో చదివాను. Masters కూడా Ivy League కాదు, ఏదో super-famous university కూడా కాదు.
+              </p>
+
+              <p>
+                So మీతో US కి వచ్చే ముందు జరిగిన ప్రతి interaction లో, నేను secretly extra preparation చేసేదాన్ని 😂.<br />
+                ఏదైనా topic వస్తే ముందే research చేసి, "నాకు కూడా విషయాలు తెలుసు okay… నేను dumb కాదు!" అని somehow prove చేయాలని చాలా try చేసేదాన్ని.
+              </p>
+
+              <p>
+                I genuinely don't know if you ever noticed that.<br />
+                కానీ నా brain లో మాత్రం ఒక్కటే:<br />
+                "పిన్ని నన్ను ఏదో పిల్ల బచ్చా అనుకోకూడదు!" 😭
+              </p>
+
+              <p>
+                So మీరు December 2022 లో first time నన్ను Chicago కి invite చేసినప్పుడు, I was honestly very scared.<br />
+                నేను మీతో bond అవుతానా? అందరితో comfortable గా ఉంటానా? ఏమైనా awkward గా ఉంటుందా?<br />
+                అని చాలా overthink చేశాను.
+              </p>
+
+              <p>
+                దానికంటే ఎక్కువగా, నా brain లో ఇంకో పెద్ద list ఉండేది —<br />
+                నేను మీ అంత ambitious కాదు. Multitasking పెద్దగా రాదు. కొంచెం tomboy type. Highly accomplished person ని కాదు. Super educated genius కూడా కాదు.<br />
+                Basically, "నేను అసలు వీళ్ళ ఇంట్లో set అవుతానా?" అనే doubt 😭.
+              </p>
+
+              <p>
+                But I was wrong.<br />
+                And I'm so, so glad that you proved me wrong.
+              </p>
+
+              <p>
+                మీరు చూపించిన ప్రేమ, affection, warmth వల్ల నా mind లో ఉన్న ఆ unnecessary fears అన్నీ చాలా quickly disappear అయిపోయాయి.
+              </p>
+
+              <p>
+                మీతో ఉన్నప్పుడు ఎప్పుడూ,<br />
+                "నేను relative మాత్రమే," "కొన్ని limits maintain చేయాలి," "ఇంతవరకే మాట్లాడాలి," "ఎక్కువ close అవ్వకూడదు,"<br />
+                అనే feeling నాకు ఒక్కసారి కూడా రాలేదు.
+              </p>
+
+              <p>
+                And that means a lot to me.<br />
+                Because I genuinely wanted this bond to work.
+              </p>
+
+              <p>
+                కానీ funny part ఏమిటంటే — నేను నా side నుంచి ఏదో special effort పెట్టి bond build చేయాల్సిన అవసరమే రాలేదు.<br />
+                It just… happened.<br />
+                Things moved so naturally, so easily.<br />
+                And honestly, ఆ credit అంతా నేను మీకే ఇస్తాను.<br />
+                You made it easy.
+              </p>
+
+              <p>
+                నేను చాలా reserved person అని మీకు తెలుసు. I'm an introvert, I don't mingle with people easily, and కొత్త వాళ్లతో comfortable అవ్వడానికి నాకు normally చాలా time పడుతుంది.
+              </p>
+
+              <p>
+                So US కి వచ్చే ముందు, మీతో మాత్రమే కాదు, family లోని మిగతా వాళ్లతో కూడా ఇంత close గా bond అవుతానని నేను అసలు imagine చేయలేదు.
+              </p>
+
+              <p>But somehow, because of the space and comfort you gave me, it never felt forced.</p>
+
+              <p>
+                Thank you for making me part of your family. And more importantly, thank you for making me feel like I belonged there.<br />
+                ఆ feeling నాకు చాలా precious.
+              </p>
+
+              <p>
+                దొడ్డమ్మ తర్వాత, నేను ఇంత open గా, freely, comfortable గా bond అవగలిగింది మీతోనే.<br />
+                And I don't think I tell you that enough.
+              </p>
+
+              <p>
+                ఇంకో విషయం కూడా ఉంది.<br />
+                మీకు గుర్తుందో లేదో నాకు తెలియదు — but I remember.
+              </p>
+
+              <p>
+                నేను Computer Engineering చదవాలి, నా passion ని follow అవ్వాలి, దాంట్లోనే successful అవగలను అని మీరు అమ్మతో మాట్లాడి ఉండకపోతే…<br />
+                I genuinely don't know if I would be where I am today.<br />
+                I probably would not have been at Micron today.
+              </p>
+
+              <p>
+                Sometimes life changes because of some huge dramatic event.<br />
+                And sometimes, it changes because one person believes in you at the right time and says,<br />
+                "Let her do it. She can."<br />
+                For me, మీరు అలా నిలబడ్డ moments లో అది ఒకటి.<br />
+                And I will always be grateful for that.
+              </p>
+
+              <p>
+                Okay… ఇప్పుడు Telugu quota అయిపోయింది 😂.<br />
+                Switching back to English for some time. పర్లేదు, తిట్టుకోకండి.<br />
+                English బాగా అలవాటు అయిపోయింది, I guess. చూస్తుంటే summer classes ఒక్కటే సరిపోవు — winter, summer, weekend batch అన్నీ join అవ్వాలి అనుకుంటా తెలుగు కోసం 😝😂.
+              </p>
+
+              <p>
+                But jokes apart…<br />
+                Thank you so much for EVERYTHINGGGG.<br />
+                For the love. For the encouragement. For believing in me. For making me comfortable. For treating me like your own. For being someone I can talk to without thinking twice.
+              </p>
+
+              <p>
+                And oh, by the way —<br />
+                Happy Teachers' Day too! ❤️<br />
+                Because in a lot of ways, you have been one for me too.
+              </p>
+
+              <p>Thank you for being my friend, philosopher, guide, and most importantly - నా పిన్ని.</p>
+
+              <p>
+                Have a wonderful 50th birthday, Pinni.<br />
+                Sorry this is coming so late.<br />
+                But I really hope you liked this little attempt.<br />
+                And more than anything else, I hope it brought a smile to your face.
+              </p>
+
+              <p class="signature">
+                With all the love,<br />
+                మీ బుర్ర తినే partner — Sound 😝
+              </p>
+            </div>
+          </article>
+
+          <div class="front"></div>
+          <div class="right-fold"></div>
+
+          <div class="flap">
+            <div class="flap-face"></div>
+            <div class="flap-back"></div>
+          </div>
+
+          <button class="seal" id="sealBtn" type="button" aria-label="Tap the candle to open your birthday card" aria-expanded="false">
+            50
+            <small>Tap to open</small>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const wrap = document.getElementById('envelopeWrap');
+    const sealBtn = document.getElementById('sealBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const letterContent = document.getElementById('letterContent');
+
+    function openCard(){
+      if (wrap.classList.contains('open')) return;
+      wrap.classList.add('open');
+      sealBtn.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('card-open');
+      setTimeout(() => {
+        letterContent.scrollTop = 0;
+      }, 700);
+    }
+
+    function closeCard(){
+      wrap.classList.remove('open');
+      sealBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('card-open');
+      letterContent.scrollTop = 0;
+    }
+
+    sealBtn.addEventListener('click', openCard);
+
+    closeBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeCard();
+    });
+
+    letterContent.addEventListener('click', (event) => {
+      if (wrap.classList.contains('open')) event.stopPropagation();
+    });
+  </script>
+</body>
+</html>
